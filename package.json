@@ -1,0 +1,22 @@
+{
+  "name": "@yan-sheng-li/diy_vue_component",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "A simple Vue component library",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yan-sheng-li/diy_vue_component.git"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/"
+  },
+  "peerDependencies": {
+    "vue": "^3.0.0"
+  }
+}
