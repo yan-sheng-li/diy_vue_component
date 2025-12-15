@@ -1,6 +1,6 @@
-import { ElButton as d } from "element-plus";
-import { resolveComponent as s, createBlock as r, openBlock as i, withCtx as c, renderSlot as f } from "vue";
-const u = (e, o) => {
+import { ElButton as s } from "element-plus";
+import { resolveComponent as d, createBlock as i, openBlock as r, withCtx as c, renderSlot as u } from "vue";
+const f = (e, o) => {
   const t = e.__vccOpts || e;
   for (const [n, a] of o)
     t[n] = a;
@@ -8,7 +8,7 @@ const u = (e, o) => {
 }, p = {
   name: "MyButton",
   components: {
-    ElButton: d
+    ElButton: s
   },
   props: {
     type: {
@@ -29,21 +29,26 @@ const u = (e, o) => {
     }
   }
 };
-function _(e, o, t, n, a, y) {
-  const l = s("el-button");
-  return i(), r(l, {
+function y(e, o, t, n, a, m) {
+  const l = d("el-button");
+  return r(), i(l, {
     type: t.type,
     size: t.size,
     disabled: t.disabled,
     loading: t.loading
   }, {
     default: c(() => [
-      f(e.$slots, "default")
+      u(e.$slots, "default")
     ]),
     _: 3
   }, 8, ["type", "size", "disabled", "loading"]);
 }
-const B = /* @__PURE__ */ u(p, [["render", _]]);
+const _ = /* @__PURE__ */ f(p, [["render", y]]), b = {
+  install(e) {
+    e.component("MyButton", _);
+  }
+};
 export {
-  B as default
+  _ as MyButton,
+  b as default
 };
