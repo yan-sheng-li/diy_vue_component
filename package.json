@@ -1,11 +1,13 @@
 {
   "name": "@yan-sheng-li/diy_vue_component",
   "version": "1.0.1",
-  "main": "src/index.js",
+  "main": "dist/diy-vue-component.umd.js",
+  "module": "dist/diy-vue-component.es.js",
   "files": [
-    "src"
+    "dist"
   ],
   "scripts": {
+    "build": "vite build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -20,6 +22,13 @@
     "registry": "https://npm.pkg.github.com/"
   },
   "peerDependencies": {
-    "vue": "^3.0.0"
+    "element-plus": "^2.12.0",
+    "vue": "^3.5.25"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^6.0.3",
+    "element-plus": "^2.12.0",
+    "vite": "^7.3.0",
+    "vue": "^3.5.25"
   }
 }

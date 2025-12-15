@@ -1,21 +1,37 @@
 <template>
-  <button class="my-btn">
+  <el-button :type="type" :size="size" :disabled="disabled" :loading="loading">
     <slot />
-  </button>
+  </el-button>
 </template>
 
 <script>
+import { ElButton } from 'element-plus'
+
 export default {
-  name: 'MyButton'
+  name: 'MyButton',
+  components: {
+    ElButton
+  },
+  props: {
+    type: {
+      type: String,
+      default: 'primary'
+    },
+    size: {
+      type: String,
+      default: 'default'
+    },
+    disabled: {
+      type: Boolean,
+      default: false
+    },
+    loading: {
+      type: Boolean,
+      default: false
+    }
+  }
 }
 </script>
 
 <style scoped>
-.my-btn {
-  padding: 8px 16px;
-  background: #409eff;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-}
 </style>
