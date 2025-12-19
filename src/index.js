@@ -1,7 +1,8 @@
 import MyButton from './MyButton.vue'
+import HelloWorld from './HelloWorld.vue'
 
 // 所有组件数组
-const components = [MyButton]
+const components = [MyButton, HelloWorld]
 
 // 全局注册
 const install = (app) => {
@@ -9,5 +10,5 @@ const install = (app) => {
 }
 
 // 支持按需导入
-export { MyButton }
+export { MyButton, HelloWorld }
 export default { install }
