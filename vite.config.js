@@ -11,12 +11,14 @@ export default defineConfig({
       fileName: (format) => `diy-vue-component.${format}.js`
     },
     rollupOptions: {
-      external: ['vue', 'element-plus'],
+      external: ['vue', 'element-plus', 'md-editor-v3'],
       output: {
-        globals: {
-          vue: 'Vue',
-          'element-plus': 'ElementPlus'
-        }
+        // 为npm环境准备，暂时不需要
+        // globals: {
+        //   vue: 'Vue',
+        //   'element-plus': 'ElementPlus',
+        //   'md-editor-v3': 'MdEditor'
+        // }
       }
     }
   }
