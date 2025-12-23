@@ -10,6 +10,12 @@
 <script setup>
 import { ref } from 'vue'
 
+import { defineComponent } from 'vue'
+
+defineComponent({
+  name: 'HelloWorld'
+})
+
 // 接收父组件传递的参数（props）
 defineProps({
   name: {

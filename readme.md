@@ -31,6 +31,11 @@ const app = createApp(App)
 app.use(DiyVueComponent)
 ```
 
+或者按需导入
+```js
+import {HelloWorld} from '@yan-sheng-li/diy_vue_component'
+```
+
 然后在项目任意页面就可以使用组件了，如：
 ```vue
 <HelloWorld name="张三" />
