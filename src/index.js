@@ -1,9 +1,11 @@
 // 组件库入口文件
 import MyButton from './MyButton.vue'
 import HelloWorld from './HelloWorld.vue'
+import CrudTable from './CrudTable.vue'
+import MapPicker from './MapPicker.vue'
 
 // 所有组件数组
-const components = [MyButton, HelloWorld]
+const components = [MyButton, HelloWorld, CrudTable, MapPicker]
 
 // 全局注册
 const install = (app) => {
@@ -11,5 +13,5 @@ const install = (app) => {
 }
 
 // 支持按需导入
-export { MyButton, HelloWorld }
+export { MyButton, HelloWorld, CrudTable, MapPicker }
 export default { install }
