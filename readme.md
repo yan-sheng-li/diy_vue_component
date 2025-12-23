@@ -2,7 +2,7 @@
 
 ## 打包发布
 ```bash
-npm build
+npm run build
 ```
 ```bash
 npm version patch   # 例如 1.0.2
