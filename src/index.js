@@ -1,15 +1,18 @@
-// 组件库入口文件
+// index.js
 import MyButton from './MyButton.vue'
 import HelloWorld from './HelloWorld.vue'
 import CrudTable from './CrudTable.vue'
 import MapPicker from './MapPicker.vue'
 
-// 所有组件数组
 const components = [MyButton, HelloWorld, CrudTable, MapPicker]
 
-// 全局注册
 const install = (app) => {
-  components.forEach(c => app.component(c.name, c))
+  components.forEach(c => {
+    const comp = c.__esModule ? c.default : c
+    if (comp.name) {
+      app.component(comp.name, comp)
+    }
+  })
 }
 
 // 支持按需导入
