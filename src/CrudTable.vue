@@ -3,7 +3,7 @@
   <div class="crud-container">
     <!-- 搜索区域 -->
     <el-card v-if="config.searchFields?.length" class="search-form" shadow="never">
-      <el-form :model="searchForm" ref="searchFormRef" :inline="true">
+      <el-form :model="searchForm" ref="searchFormRef" :inline="true" @submit.prevent>
         <el-form-item v-for="field in config.searchFields" :key="field.prop" :label="field.label" :prop="field.prop">
 
           <!-- 下拉选择框 -->
@@ -18,7 +18,7 @@
             <el-radio v-for="opt in getOptions(field)" :key="opt.value" :value="opt.value">{{ opt.label }}</el-radio>
           </el-radio-group>
 
-          <el-input v-else-if="field.type === 'input'" v-model="searchForm[field.prop]" v-bind="field.props || {}" />
+          <el-input v-else-if="field.type === 'input'" v-model="searchForm[field.prop]" v-bind="field.props || {}" @keyup.enter="handleSearch"/>
 
           <!-- 多选框 -->
           <el-checkbox-group v-else-if="field.type === 'checkbox'" v-model="searchForm[field.prop]"
@@ -63,8 +63,9 @@
         </div>
       </template>
 
-      <el-table :data="tableData" v-loading="loading" @selection-change="handleSelectionChange" :height="config.tableHeight ?? 380"
-        :border="config.border ?? true" :stripe="config.stripe ?? true" :row-key="config.rowKey || 'id'">
+      <el-table :data="tableData" v-loading="loading" @selection-change="handleSelectionChange"
+        :height="config.tableHeight ?? 380" :border="config.border ?? true" :stripe="config.stripe ?? true"
+        :row-key="config.rowKey || 'id'">
         <el-table-column v-if="config.selection" type="selection" width="55" />
         <el-table-column v-for="col in config.columns" :key="col.prop || col.label" v-bind="col">
           <template #default="scope" v-if="col.slot">
@@ -121,8 +122,7 @@
             v-bind="{ ...(field.props || {}), disabled: isEdit && field.editable === false }" placeholder="请输入标签后按回车" />
 
           <!-- 处理 Markdown -->
-          <MdEditor v-else-if="field.type === 'markdown'" v-model="form[field.prop]"
-            :toolbars="['bold', 'italic', 'link', 'code']" />
+          <MdEditor v-else-if="field.type === 'markdown'" v-model="form[field.prop]" v-bind="field.props || {}" />
 
           <!-- 上传组件（支持单图/多图） -->
           <el-upload v-else-if="field.type === 'upload'" v-model:file-list="form[field.prop]"
@@ -568,8 +568,7 @@ const handleSubmit = async () => {
     console.log(submitData);  // 调试：检查输出
 
     if (isEdit.value) {
-      submitData[props.config.rowKey || 'id'] = currentId.value;
-      await props.api.update(submitData);
+      submitData[props.config.rowKey || 'id'] = currentId.value; await props.api.update(submitData);
       ElMessage.success(props.config.updateSuccessText || '更新成功');
     } else {
       await props.api.create(submitData);
@@ -621,7 +620,8 @@ const handleExceed = (files, fileList) => {
 // 对话框关闭
 const handleDialogClose = () => {
   formRef.value?.resetFields();
-  Object.keys(form).forEach(k => delete form[k]);
+  // 直接用一个新的空对象覆盖，或者重置回 initFormData 里的状态
+  Object.assign(form, {}); 
   initFormData();
 };
 
