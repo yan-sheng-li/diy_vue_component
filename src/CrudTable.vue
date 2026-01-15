@@ -154,10 +154,14 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted } from 'vue';
+import { ref, reactive, computed, onMounted, defineComponent } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { MdEditor } from 'md-editor-v3';
 import MapPicker from './MapPicker.vue';
+
+defineComponent({
+  name: 'CrudTable'
+})
 
 // 动态生成表单规则
 const generateFormRules = () => {
