@@ -8,8 +8,9 @@ const components = [MyButton, HelloWorld, CrudTable, MapPicker]
 
 const install = (app) => {
   components.forEach(c => {
-    const comp = c.__esModule ? c.default : c
-    if (comp.name) {
+    // 确保获取到正确的组件对象
+    const comp = c.default || c
+    if (comp && comp.name) {
       app.component(comp.name, comp)
     }
   })
