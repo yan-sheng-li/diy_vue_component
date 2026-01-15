@@ -24,11 +24,11 @@ npm install @yan-sheng-li/diy_vue_component@latest
 ```
 在`main.js`里面全局注册组件
 ```js
-import DiyVueComponent from '@yan-sheng-li/diy_vue_component'
+import {CrudTable} from '@yan-sheng-li/diy_vue_component'
 
 const app = createApp(App)
 
-app.use(DiyVueComponent)
+app.component('CrudTable', CrudTable) // 全局注册 CrudTable 组件
 ```
 
 或者按需导入

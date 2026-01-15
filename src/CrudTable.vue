@@ -64,7 +64,7 @@
       </template>
 
       <el-table :data="tableData" v-loading="loading" @selection-change="handleSelectionChange"
-        :height="config.tableHeight ?? 380" :border="config.border ?? true" :stripe="config.stripe ?? true"
+        :height="config.tableHeight ?? 570" :border="config.border ?? true" :stripe="config.stripe ?? true"
         :row-key="config.rowKey || 'id'">
         <el-table-column v-if="config.selection" type="selection" width="55" />
         <el-table-column v-for="col in config.columns" :key="col.prop || col.label" v-bind="col">
