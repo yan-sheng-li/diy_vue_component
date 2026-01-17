@@ -18,7 +18,7 @@
             <el-radio v-for="opt in getOptions(field)" :key="opt.value" :value="opt.value">{{ opt.label }}</el-radio>
           </el-radio-group>
 
-          <el-input v-else-if="field.type === 'input'" v-model="searchForm[field.prop]" v-bind="field.props || {}" @keyup.enter="handleSearch"/>
+          <el-input v-else-if="field.type === 'input'" clearable v-model="searchForm[field.prop]" v-bind="field.props || {}" @keyup.enter="handleSearch"/>
 
           <!-- 多选框 -->
           <el-checkbox-group v-else-if="field.type === 'checkbox'" v-model="searchForm[field.prop]"
