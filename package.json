@@ -1,6 +1,6 @@
 {
   "name": "@yan-sheng-li/diy_vue_component",
-  "version": "1.0.13",
+  "version": "1.0.14",
   "main": "dist/diy-vue-component.umd.js",
   "module": "dist/diy-vue-component.es.js",
   "types": "dist/index.d.ts",
