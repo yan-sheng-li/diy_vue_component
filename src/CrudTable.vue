@@ -18,7 +18,8 @@
             <el-radio v-for="opt in getOptions(field)" :key="opt.value" :value="opt.value">{{ opt.label }}</el-radio>
           </el-radio-group>
 
-          <el-input v-else-if="field.type === 'input'" clearable v-model="searchForm[field.prop]" v-bind="field.props || {}" @keyup.enter="handleSearch"/>
+          <el-input v-else-if="field.type === 'input'" clearable v-model="searchForm[field.prop]"
+            v-bind="field.props || {}" @keyup.enter="handleSearch" />
 
           <!-- 多选框 -->
           <el-checkbox-group v-else-if="field.type === 'checkbox'" v-model="searchForm[field.prop]"
@@ -320,7 +321,7 @@ const fetchData = async () => {
     emit('search', { searchForm, pagination });
   } catch (err) {
     console.error(err);
-    ElMessage.error('获取数据失败');
+    ElMessage.error(err?.message || '获取数据失败');
   } finally {
     loading.value = false;
   }
@@ -433,7 +434,7 @@ const handleDelete = async (row) => {
     ElMessage.success(props.config.deleteSuccessText || '删除成功');
     fetchData();
   } catch (err) {
-    if (err !== 'cancel') ElMessage.error(props.config.deleteErrorText || '删除失败');
+    if (err !== 'cancel') ElMessage.error(err?.message || '删除失败');
   }
 };
 
@@ -446,7 +447,7 @@ const handleBatchDelete = async () => {
     await props.api.batchDelete(ids);
     ElMessage.success(props.config.batchDeleteSuccessText || '删除成功');
     fetchData();
-  } catch (err) { if (err !== 'cancel') ElMessage.error(props.config.batchDeleteErrorText || '删除失败'); }
+  } catch (err) { if (err !== 'cancel') ElMessage.error(err?.message || '删除失败'); }
 };
 
 // 打开对话框
@@ -583,7 +584,7 @@ const handleSubmit = async () => {
 
   } catch (err) {
     console.error(err);
-    ElMessage.error(props.config.submitErrorText || '提交失败');
+    ElMessage.error(err?.message || '提交失败');
   } finally {
     loading.value = false;
   }
@@ -625,7 +626,7 @@ const handleExceed = (files, fileList) => {
 const handleDialogClose = () => {
   formRef.value?.resetFields();
   // 直接用一个新的空对象覆盖，或者重置回 initFormData 里的状态
-  Object.assign(form, {}); 
+  Object.assign(form, {});
   initFormData();
 };
 
