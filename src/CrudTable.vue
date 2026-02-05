@@ -406,9 +406,13 @@ const handleEdit = (row) => {
     }
 
     if (field.type === 'map') {
-      if (!value || !value.lnglat) {
-        value = { lnglat: null, address: '' };
-      }
+      value = {
+        address: row.address || '',
+        lnglat:
+          row.lng != null && row.lat != null
+            ? [row.lng, row.lat]
+            : null
+      };
     }
 
 
@@ -529,7 +533,14 @@ const handleSubmit = async () => {
 
       if (field.type === 'map') {
         const val = form[field.prop];
-        submitData[field.prop] = val ? { lnglat: val.lnglat, address: val.address } : null;
+        if (val) {
+          submitData.address = val.address || '';
+          if (Array.isArray(val.lnglat)) {
+            submitData.lng = val.lnglat[0];
+            submitData.lat = val.lnglat[1];
+          }
+        }
+        return;
       } else if (field.type === 'upload') {
         // 修复：从 fileList 提取 URLs，并根据 limit 决定字符串/数组
         const fileList = form[field.prop] || [];

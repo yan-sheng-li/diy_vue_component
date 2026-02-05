@@ -1,7 +1,7 @@
 <template>
   <div class="map-picker">
     <!-- 地址输入框 -->
-  <el-input ref="addressInput" v-model="address" placeholder="请输入地址或点击地图选择" @focus="openMapDialog" clearable>
+    <el-input ref="addressInput" v-model="address" placeholder="请输入地址或点击地图选择" @focus="openMapDialog" clearable>
       <template #suffix>
         <el-icon>
           <Icon icon="entypo:location" width="24" height="24" />
@@ -116,13 +116,24 @@ const initMap = () => {
   })
 }
 
+watch(
+  modelValue,
+  (val) => {
+    if (val && typeof val === 'object' && val.address) {
+      address.value = val.address
+    }
+  },
+  { immediate: true, deep: true }
+)
+
+
 // 搜索地址（地理编码）
 const handleSearch = () => {
   if (!searchKeyword.value.trim()) return ElMessage.warning('请输入搜索关键词')
   if (!placeSearch) return ElMessage.error('PlaceSearch 尚未初始化')
 
   placeSearch.search(searchKeyword.value, (status, result) => {
-      if (status === 'complete' && result.poiList?.pois?.length) {
+    if (status === 'complete' && result.poiList?.pois?.length) {
       const poi = result.poiList.pois[0]
       const lnglat = [poi.location.lng, poi.location.lat]
       map.setCenter(lnglat)
