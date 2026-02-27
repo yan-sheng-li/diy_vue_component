@@ -140,6 +140,11 @@
           <component v-else :is="getComponent(field.type)" v-model="form[field.prop]"
             v-bind="{ ...(field.props || {}), disabled: isEdit && field.editable === false }"
             v-on="field.events || {}" />
+
+          <!-- 提示信息 -->
+          <div v-if="field.tip" class="form-tip">
+            {{ field.tip }}
+          </div>
         </el-form-item>
       </el-form>
 
@@ -672,5 +677,13 @@ onMounted(() => { initSearchFormData(); fetchData(); });
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+.form-tip {
+  font-size: 12px;
+  color: #909399;
+  margin-top: 6px;
+  line-height: 1.4;
+  text-align: left;
 }
 </style>
