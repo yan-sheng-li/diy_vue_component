@@ -31,7 +31,7 @@
 </template>
 
 <script setup>
-import { ref, watch, onMounted, nextTick } from 'vue'
+import { ref, watch, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 // ---- 双向绑定 ----
 const modelValue = defineModel() // 支持两种格式：[lng,lat]（向后兼容）或 { lnglat: [lng,lat], address: 'xxx' }
@@ -39,24 +39,8 @@ const address = ref('')
 const dialogVisible = ref(false)
 const searchKeyword = ref('')
 const addressInput = ref(null)
-const mapLoaded = ref(false) // 标记地图是否已加载
 
 let map, marker, geocoder, placeSearch
-
-// 动态加载高德地图 SDK
-const loadAMap = () => {
-  return new Promise((resolve, reject) => {
-    if (window.AMap) {
-      resolve()
-      return
-    }
-    const script = document.createElement('script')
-    script.src = 'https://webapi.amap.com/maps?v=2.0&key=YOUR_AMAP_KEY' // 请替换为你的高德地图 Key
-    script.onload = resolve
-    script.onerror = () => reject(new Error('高德地图加载失败'))
-    document.head.appendChild(script)
-  })
-}
 
 // 辅助：从 modelValue 中提取坐标（兼容 array 或 object）
 const extractLngLat = (mv) => {
@@ -79,33 +63,15 @@ const setModelValue = (lnglat, addr) => {
 }
 
 // 打开地图弹窗
-const openMapDialog = async () => {
+const openMapDialog = () => {
   dialogVisible.value = true
-  await nextTick()
-  // 确保地图 SDK 已加载
-  if (!window.AMap) {
-    try {
-      await loadAMap()
-    } catch (e) {
-      ElMessage.error('高德地图 SDK 加载失败，请检查网络或配置')
-      return
-    }
-  }
-  await nextTick()
-  initMap()
+  setTimeout(initMap, 300)
 }
 
 // 初始化地图
 const initMap = () => {
   if (!window.AMap) {
     ElMessage.error('请先引入高德地图 JS SDK')
-    return
-  }
-
-  // 如果地图已初始化过，只需调整容器大小并显示
-  if (map) {
-    map.resize()
-    dialogVisible.value = true
     return
   }
 
