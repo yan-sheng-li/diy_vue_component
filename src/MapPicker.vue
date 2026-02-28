@@ -3,14 +3,12 @@
     <!-- 地址输入框 -->
     <el-input ref="addressInput" v-model="address" placeholder="请输入地址或点击地图选择" @focus="openMapDialog" clearable>
       <template #suffix>
-        <el-icon>
-          <Icon icon="entypo:location" width="24" height="24" />
-        </el-icon>
+        <el-icon><Location /></el-icon>
       </template>
     </el-input>
 
     <!-- 地图弹窗 -->
-    <el-dialog v-model="dialogVisible" title="选择位置" width="80%" :destroy-on-close="false">
+    <el-dialog v-model="dialogVisible" title="选择位置" width="80%" destroy-on-close @opened="handleDialogOpened">
       <div class="map-tools">
         <el-input v-model="searchKeyword" placeholder="搜索地点，例如：天安门" clearable @keyup.enter="handleSearch"
           class="search-box">
@@ -20,7 +18,7 @@
         </el-input>
       </div>
 
-      <div id="map-container" class="map-container"></div>
+      <div ref="mapContainerRef" id="map-container" class="map-container" style="height: 400px;"></div>
 
       <template #footer>
         <el-button @click="closeDialog">取消</el-button>
@@ -33,15 +31,27 @@
 <script setup>
 import { ref, watch, onMounted, nextTick } from 'vue'
 import { ElMessage } from 'element-plus'
+import { Location } from '@element-plus/icons-vue'
+
+// ---- props ----
+const props = defineProps({
+  amapKey: {
+    type: String,
+    default: '' // 允许外部传入高德地图 Key
+  }
+})
+
 // ---- 双向绑定 ----
 const modelValue = defineModel() // 支持两种格式：[lng,lat]（向后兼容）或 { lnglat: [lng,lat], address: 'xxx' }
 const address = ref('')
 const dialogVisible = ref(false)
 const searchKeyword = ref('')
 const addressInput = ref(null)
-const mapLoaded = ref(false) // 标记地图是否已加载
+const mapContainerRef = ref(null)
 
-let map, marker, geocoder, placeSearch
+let map = null, marker = null, geocoder = null, placeSearch = null
+let isScriptLoading = false
+let isScriptLoaded = false
 
 // 动态加载高德地图 SDK
 const loadAMap = () => {
@@ -50,10 +60,38 @@ const loadAMap = () => {
       resolve()
       return
     }
+    if (isScriptLoading) {
+      // 如果脚本正在加载，等待完成
+      const checkLoaded = setInterval(() => {
+        if (isScriptLoaded) {
+          clearInterval(checkLoaded)
+          resolve()
+        }
+      }, 100)
+      setTimeout(() => {
+        clearInterval(checkLoaded)
+        if (!window.AMap) reject(new Error('高德地图加载超时'))
+      }, 10000)
+      return
+    }
+    
+    const key = props.amapKey || 'YOUR_AMAP_KEY'
+    if (key === 'YOUR_AMAP_KEY') {
+      reject(new Error('请配置高德地图 Key，通过 amap-key 属性传入'))
+      return
+    }
+    
+    isScriptLoading = true
     const script = document.createElement('script')
-    script.src = 'https://webapi.amap.com/maps?v=2.0&key=YOUR_AMAP_KEY' // 请替换为你的高德地图 Key
-    script.onload = resolve
-    script.onerror = () => reject(new Error('高德地图加载失败'))
+    script.src = `https://webapi.amap.com/maps?v=2.0&key=${key}`
+    script.onload = () => {
+      isScriptLoaded = true
+      resolve()
+    }
+    script.onerror = () => {
+      isScriptLoading = false
+      reject(new Error('高德地图加载失败'))
+    }
     document.head.appendChild(script)
   })
 }
@@ -80,60 +118,93 @@ const setModelValue = (lnglat, addr) => {
 
 // 打开地图弹窗
 const openMapDialog = async () => {
-  dialogVisible.value = true
-  await nextTick()
   // 确保地图 SDK 已加载
   if (!window.AMap) {
     try {
       await loadAMap()
     } catch (e) {
-      ElMessage.error('高德地图 SDK 加载失败，请检查网络或配置')
+      ElMessage.error(e.message || '高德地图 SDK 加载失败，请检查网络或配置')
       return
     }
   }
+  dialogVisible.value = true
+  // 地图将在 handleDialogOpened 中初始化（dialog 完全打开后）
+}
+
+// Dialog 完全打开后的回调（动画完成）
+const handleDialogOpened = async () => {
   await nextTick()
+  await nextTick()
+  // 再次确保容器有高度
+  const container = mapContainerRef.value
+  if (container && container.offsetHeight === 0) {
+    // 如果高度还是 0，再等一会儿
+    await new Promise(resolve => setTimeout(resolve, 200))
+  }
   initMap()
 }
 
 // 初始化地图
 const initMap = () => {
+  console.log('[MapPicker] initMap 被调用')
+  
   if (!window.AMap) {
+    console.error('[MapPicker] window.AMap 不存在')
     ElMessage.error('请先引入高德地图 JS SDK')
     return
   }
 
-  // 如果地图已初始化过，只需调整容器大小并显示
-  if (map) {
-    map.resize()
-    dialogVisible.value = true
+  // 检查容器是否存在且有尺寸
+  const container = mapContainerRef.value
+  if (!container) {
+    console.error('[MapPicker] 地图容器未找到')
     return
+  }
+  
+  console.log('[MapPicker] 容器尺寸:', container.offsetWidth, 'x', container.offsetHeight)
+
+  // 如果地图已初始化过，销毁后重新创建
+  if (map) {
+    console.log('[MapPicker] 销毁旧地图实例')
+    map.destroy()
+    map = null
+    marker = null
   }
 
   // 地图实例
   const initialCenter = extractLngLat(modelValue.value) || [116.397428, 39.90923]
-  map = new AMap.Map('map-container', {
-    zoom: 12,
-    center: initialCenter
-  })
+  console.log('[MapPicker] 初始中心点:', initialCenter)
+  
+  try {
+    map = new AMap.Map('map-container', {
+      zoom: 12,
+      center: initialCenter
+    })
+    console.log('[MapPicker] 地图实例创建成功')
+  } catch (e) {
+    console.error('[MapPicker] 创建地图失败:', e)
+    ElMessage.error('地图初始化失败：' + e.message)
+    return
+  }
 
   // 地理编码服务
   AMap.plugin(['AMap.Geocoder', 'AMap.PlaceSearch'], () => {
     geocoder = new AMap.Geocoder()
     placeSearch = new AMap.PlaceSearch({ map })
+    console.log('[MapPicker] 地理编码插件加载成功')
   })
 
-  // 标记点（先不设置位置）
+  // 标记点
   marker = new AMap.Marker({ map })
+  console.log('[MapPicker] 标记创建成功')
 
-  // 如果已有坐标，放置标记并回显地址（支持 array 或 object）
+  // 如果已有坐标，放置标记并回显地址
   const existing = extractLngLat(modelValue.value)
   if (existing) {
     marker.setPosition(existing)
-    // 如果 modelValue 带 address，直接使用；否则执行逆编码
     const addrFromModel = modelValue.value && modelValue.value.address
     if (addrFromModel) {
       address.value = addrFromModel
-      // 在标记上显示地址标签
       try { marker.setLabel({ content: address.value, offset: new AMap.Pixel(0, -30) }) } catch (e) { /* ignore */ }
     } else {
       reverseGeocode(existing)
@@ -144,7 +215,6 @@ const initMap = () => {
   map.on('click', (e) => {
     const lnglat = [e.lnglat.getLng(), e.lnglat.getLat()]
     marker.setPosition(lnglat)
-    // 先更新 modelValue（会被 reverseGeocode 覆盖 address 字段）
     setModelValue(lnglat, '')
     reverseGeocode(lnglat)
   })
@@ -208,6 +278,14 @@ const confirmLocation = () => {
 // 关闭对话框（用于取消按钮）
 const closeDialog = () => {
   dialogVisible.value = false
+  // 销毁地图实例，下次打开时重新创建
+  if (map) {
+    map.destroy()
+    map = null
+    marker = null
+    geocoder = null
+    placeSearch = null
+  }
   try { document.activeElement && document.activeElement.blur && document.activeElement.blur(); } catch (e) { /* ignore */ }
 }
 

@@ -29,8 +29,9 @@
           </el-checkbox-group>
 
           <!-- 日期/其他类型 -->
-          <component v-else :is="getComponent(field.type)" v-model="searchForm[field.prop]" v-bind="field.props || {}"
-            v-on="field.events || {}" />
+          <component v-else :is="getComponent(field.type)" v-model="searchForm[field.prop]"
+            v-bind="field.props || {}" v-on="field.events || {}"
+            :amap-key="field.amapKey || config.amapKey" />
         </el-form-item>
 
         <el-form-item>
@@ -139,7 +140,8 @@
           <!-- 其他类型组件 -->
           <component v-else :is="getComponent(field.type)" v-model="form[field.prop]"
             v-bind="{ ...(field.props || {}), disabled: isEdit && field.editable === false }"
-            v-on="field.events || {}" />
+            v-on="field.events || {}"
+            :amap-key="field.amapKey || config.amapKey" />
 
           <!-- 提示信息 -->
           <div v-if="field.tip" class="form-tip">
