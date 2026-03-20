@@ -29,9 +29,8 @@
           </el-checkbox-group>
 
           <!-- 日期/其他类型 -->
-          <component v-else :is="getComponent(field.type)" v-model="searchForm[field.prop]"
-            v-bind="field.props || {}" v-on="field.events || {}"
-            :amap-key="field.amapKey || config.amapKey" />
+          <component v-else :is="getComponent(field.type)" v-model="searchForm[field.prop]" v-bind="field.props || {}"
+            v-on="field.events || {}" :amap-key="field.amapKey || config.amapKey" />
         </el-form-item>
 
         <el-form-item>
@@ -139,8 +138,7 @@
 
           <!-- 其他类型组件 -->
           <component v-else :is="getComponent(field.type)" v-model="form[field.prop]"
-            v-bind="{ ...(field.props || {}), disabled: isEdit && field.editable === false }"
-            v-on="field.events || {}"
+            v-bind="{ ...(field.props || {}), disabled: isEdit && field.editable === false }" v-on="field.events || {}"
             :amap-key="field.amapKey || config.amapKey" />
 
           <!-- 提示信息 -->
@@ -332,6 +330,11 @@ const fetchData = async () => {
   } finally {
     loading.value = false;
   }
+};
+
+// 刷新表格数据（保持当前页码和搜索条件）
+const refresh = async () => {
+  await fetchData();
 };
 
 // 搜索/重置
@@ -649,7 +652,7 @@ const handleDialogClose = () => {
 };
 
 // 暴露方法给父组件
-defineExpose({ fetchData, openDialog, handleEdit, handleDelete, updateTableData, getSelectedRows: () => multipleSelection.value });
+defineExpose({ fetchData, refresh, openDialog, handleEdit, handleDelete, updateTableData, getSelectedRows: () => multipleSelection.value });
 
 // 初始化
 onMounted(() => { initSearchFormData(); fetchData(); });
