@@ -524,9 +524,20 @@ const handleSubmit = async () => {
           // 根据 props.type 判断是日期还是日期时间
           const dateType = field.props?.type || 'date';
           if (dateType === 'datetime' || dateType === 'datetime-picker') {
-            value = new Date(value).toISOString().slice(0, 19).replace('T', ' ');
+            // 格式化日期时间：YYYY-MM-DD HH:mm:ss
+            const year = value.getFullYear();
+            const month = String(value.getMonth() + 1).padStart(2, '0');
+            const day = String(value.getDate()).padStart(2, '0');
+            const hours = String(value.getHours()).padStart(2, '0');
+            const minutes = String(value.getMinutes()).padStart(2, '0');
+            const seconds = String(value.getSeconds()).padStart(2, '0');
+            value = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
           } else {
-            value = new Date(value).toISOString().slice(0, 10);
+            // 格式化日期：YYYY-MM-DD
+            const year = value.getFullYear();
+            const month = String(value.getMonth() + 1).padStart(2, '0');
+            const day = String(value.getDate()).padStart(2, '0');
+            value = `${year}-${month}-${day}`;
           }
         }
       }
