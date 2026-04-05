@@ -320,7 +320,7 @@ const fetchData = async () => {
   try {
     loading.value = true;
     const params = { ...searchForm, page: pagination.currentPage, pageSize: pagination.pageSize };
-    const res = await props.api.list(params);
+    const res = await props.api.page(params);
     tableData.value = res.data || res.records || res.list || [];
     pagination.total = res.total || res.count || 0;
     emit('search', { searchForm, pagination });
