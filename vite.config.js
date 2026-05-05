@@ -11,7 +11,7 @@ export default defineConfig({
       fileName: (format) => `diy-vue-component.${format}.js`
     },
     rollupOptions: {
-      external: ['vue', 'element-plus', 'md-editor-v3'],
+      external: ['vue', 'element-plus', 'md-editor-v3', 'axios'],
       output: {
         // 为npm环境准备，暂时不需要
         // globals: {
