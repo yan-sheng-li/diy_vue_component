@@ -123,7 +123,9 @@
             v-bind="{ ...(field.props || {}), disabled: isEdit && field.editable === false }" placeholder="请输入标签后按回车" />
 
           <!-- 处理 Markdown -->
-          <MdEditor v-else-if="field.type === 'markdown'" v-model="form[field.prop]" v-bind="field.props || {}" />
+          <MdEditor v-else-if="field.type === 'markdown'" v-model="form[field.prop]" v-bind="field.props || {}"
+            :onUploadImg="(files, callback) => handleUploadImg(files, field.props?.action, callback)"
+            :toolbars="['bold', 'italic', 'link', 'code', 'image']" />
 
           <!-- 上传组件（支持单图/多图） -->
           <el-upload v-else-if="field.type === 'upload'" v-model:file-list="form[field.prop]"
@@ -164,6 +166,31 @@ import { ref, reactive, computed, onMounted, defineComponent } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { MdEditor } from 'md-editor-v3';
 import MapPicker from './MapPicker.vue';
+import axios from 'axios';
+
+const handleUploadImg = async (files, action, callback) => {
+  if (!action) {
+    console.warn('Markdown图片上传地址未配置,请通过props.action配置');
+    return;
+  }
+  const res = await Promise.all(
+    files.map((file) => {
+      return new Promise((rev, rej) => {
+        const formData = new FormData();
+        formData.append('file', file);
+        axios
+          .post(action, formData, {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
+          })
+          .then((res) => rev(res))
+          .catch((error) => rej(error));
+      });
+    })
+  );
+  callback(res.map((item) => item.data));
+};
 
 defineComponent({
   name: 'CrudTable'
