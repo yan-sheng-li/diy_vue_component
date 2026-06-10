@@ -618,7 +618,18 @@ const handleSubmit = async () => {
               return res.url;
             }
 
-            // ⑤ 最后兜底
+            // ⑤ data 为字符串（后端返回 { code, msg, data } 结构）
+            if (typeof res?.data === 'string') {
+              return res.data;
+            }
+
+            // ⑥ data 对象中包含 url/imageUrl
+            if (res?.data && typeof res.data === 'object') {
+              if (typeof res.data.url === 'string') return res.data.url;
+              if (typeof res.data.imageUrl === 'string') return res.data.imageUrl;
+            }
+
+            // ⑦ 最后兜底
             return file.url || '';
           })
           .filter(Boolean);
@@ -653,6 +664,28 @@ const handleSubmit = async () => {
 // 上传变更时即时裁剪 fileList
 const handleUploadChange = (field, file, fileList) => {
   const limit = (field.props && field.props.limit) ? Number(field.props.limit) : 1;
+
+  // 上传成功后，将真实 URL 写回 file.url，以便预览和提交时能正确读取
+  if (file.status === 'success' && file.response) {
+    const res = file.response;
+    let realUrl = '';
+
+    if (typeof res === 'string') {
+      realUrl = res;
+    } else if (typeof res?.data === 'string') {
+      realUrl = res.data;
+    } else if (res?.data && typeof res.data === 'object') {
+      realUrl = res.data.url || res.data.imageUrl || '';
+    } else if (typeof res?.imageUrl === 'string') {
+      realUrl = res.imageUrl;
+    } else if (typeof res?.url === 'string') {
+      realUrl = res.url;
+    }
+
+    if (realUrl) {
+      file.url = realUrl;
+    }
+  }
 
   if (limit === 1 && fileList.length > 1) {
     // 只保留最后上传的文件
