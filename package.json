@@ -5,14 +5,18 @@
   "module": "dist/diy-vue-component.es.js",
   "types": "dist/index.d.ts",
   "files": [
-    "dist"
+    "dist",
+    "readme.md"
   ],
   "scripts": {
     "build": "vite build",
+    "release:patch": "npm version patch && git push origin main --tags",
+    "release:minor": "npm version minor && git push origin main --tags",
+    "release:major": "npm version major && git push origin main --tags",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
-  "author": "",
+  "author": "muzi_zone",
   "license": "ISC",
   "description": "A simple Vue component library",
   "repository": {
@@ -20,7 +24,7 @@
     "url": "git+https://github.com/yan-sheng-li/diy_vue_component.git"
   },
   "publishConfig": {
-    "registry": "https://npm.pkg.github.com/"
+    "registry": "https://registry.npmjs.org/"
   },
   "peerDependencies": {
     "element-plus": "^2.12.0",
